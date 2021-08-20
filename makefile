@@ -1,4 +1,5 @@
 #生成makefile所在的目录的绝对路径
+ARCH = $(shell uname -m)
 #MAKEFILE_LIST是make工具定义的环境变量，最后一个值就是当前的makefile的启动路径（可能是相对路径）
 TOP_DIR := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
@@ -15,6 +16,12 @@ LD := gcc
 #编译选项
 CXXFLAGS := -std=c++11 -Wall -m64 -O2 -fPIC -fmessage-length=0 -fvisibility=hidden
 CXXFLAGS_DBG := -std=c++11 -Wall -m64 -O0 -g3 -fPIC -msse4.2 -fmessage-length=0 -fvisibility=hidden
+ifeq ($(ARCH), x86_64)
+	CXXFLAGS += -mfma
+else ifeq ($(ARCH), aarch64)
+	CXXFLAGS += -DRTE_ARCH_64 -DRTE_ARCH_ARM64_MEMCPY -DRTE_CACHE_LINE_SIZE=128
+endif
+
 
 #宏定义
 MACROS := -D_LINUX
